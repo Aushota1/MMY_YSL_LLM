@@ -1,0 +1,99 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyTorch models and checkpoints
+*.pth
+*.pt
+*.ckpt
+*.h5
+*.pkl
+*.pb
+*.onnx
+*.tflite
+
+# Checkpoints directories
+checkpoints/
+chekpoint/
+my_checkpoints/
+embedding_checkpoints/
+example_checkpoints/
+trm_benchmarks/
+trm_checkpoints/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Logs
+*.log
+logs/
+*.out
+
+# Data files (большие)
+*.csv
+*.tsv
+*.json
+*.jsonl
+*.parquet
+*.feather
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Git LFS
+.gitattributes
+
+# PDF files (большие)
+*.pdf
+
+# Specific large files
+gpt_model_checkpoint.pth
+embedding_model.pth
+best_model_epoch_*.pth
+final_model.pth
+

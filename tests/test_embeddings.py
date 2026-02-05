@@ -11,7 +11,7 @@ from typing import List, Tuple
 import numpy as np
 
 # Добавляем родительскую директорию в путь для импорта
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from BPE_STUCTUR import BPETokenizer
 from EMBEDDING_LAYER.embedding_layer import EmbeddingLayer, create_embedding_from_tokenizer
