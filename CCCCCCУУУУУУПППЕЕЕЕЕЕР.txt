@@ -1,0 +1,16 @@
+Приоритет 1: Критично для улучшения
+KV Cache для ускорения генерации
+Learning Rate Scheduling (warmup + cosine)
+Weight Tying (экономия параметров)
+Приоритет 2: Важно для масштабирования
+Gradient Checkpointing
+Mixed Precision Training
+Beam Search для лучшей генерации
+Приоритет 3: Для production
+API сервер (Flask/FastAPI)
+Batch generation
+Мониторинг и логирование
+Приоритет 4: Дополнительные возможности
+LoRA для fine-tuning
+Контекстная память для диалогов
+Few-shot learning

@@ -1,0 +1,131 @@
+SystemVerilog is a hardware description and verification language that combines features from Verilog, VHDL, and C++ to provide a comprehensive platform for design and verification.
+SystemVerilog extends Verilog by adding powerful constructs for object-oriented programming, constrained random testing, assertions, and functional coverage.
+The language introduces classes, inheritance, and polymorphism, enabling the creation of complex, reusable testbenches and verification environments.
+SystemVerilog's constrained random stimulus generation allows verification engineers to automatically create a wide range of test scenarios to find corner-case bugs.
+Assertions in SystemVerilog, including Immediate (assert) and Concurrent (assert property), are crucial for formalizing design intent and checking temporal behavior.
+Functional coverage groups in SystemVerilog enable the measurement of which parts of the design specification have been exercised by the verification suite.
+The Direct Programming Interface (DPI) in SystemVerilog allows seamless integration of C, C++, and SystemVerilog code for simulation performance or legacy model use.
+SystemVerilog interfaces encapsulate communication between modules, reducing wiring errors and simplifying large-scale system-level connections.
+The language supports sophisticated data types such as structures, unions, and enumerated types, bringing higher-level abstraction to hardware modeling.
+SystemVerilog's program blocks separate the testbench from the design timeline, helping to avoid race conditions in scheduling during simulation.
+Modports within interfaces define directions for signals, explicitly specifying input and output roles for connected modules within an interface.
+The clocking block construct in SystemVerilog specifies synchronization events and timing relationships for signals, simplifying signal driving and sampling.
+SystemVerilog provides powerful queue and dynamic array data types, along with associative arrays, for flexible data storage and manipulation in testbenches.
+The randomize() method and rand/randc variable modifiers form the core of SystemVerilog's constraint-driven random stimulus generation capability.
+SystemVerilog mailboxes and semaphores are built-in synchronization primitives that facilitate communication and resource management between concurrent processes.
+The covergroup, coverpoint, and cross constructs allow for detailed specification of functional coverage models to gauge verification completeness.
+SystemVerilog assertions (SVA) include sequences and properties that can describe complex temporal behavior over multiple clock cycles for formal verification.
+The bind keyword in SystemVerilog allows embedding assertions and other code directly into a module without altering the original module's source code.
+SystemVerilog's always_comb, always_ff, and always_latch procedural blocks enforce design intent for combinatorial and sequential logic synthesis.
+The package construct in SystemVerilog provides a namespace for shared parameters, data types, functions, and classes across multiple modules and testbenches.
+SystemVerilog supports the virtual keyword for interfaces and classes, enabling polymorphism and dynamic binding in object-oriented testbenches.
+The local and protected access modifiers in SystemVerilog classes enforce encapsulation and control visibility of class properties and methods.
+The config construct in SystemVerilog allows for specifying which source files and libraries to use for particular instances in a hierarchical design.
+SystemVerilog's generate blocks, enhanced from Verilog, allow for conditional and iterative elaboration of hardware structures and testbench code.
+The checker unit in SystemVerilog is a specialized construct for encapsulating assertion-based verification logic in a reusable manner.
+SystemVerilog provides system tasks like $cast for safe dynamic casting of object handles and $asserton/$assertoff for controlling assertion execution.
+The process class in SystemVerilog enables low-level control and status monitoring of concurrently executing threads (processes) within a simulation.
+The uvm_* class library, while part of the Universal Verification Methodology, is often used with SystemVerilog to build standardized verification components.
+SystemVerilog's randcase and randsequence constructs provide procedural random control flow generation for creating varied test scenario sequences.
+The alias statement in SystemVerilog allows two identifiers to refer to the same net, simplifying connections and reducing redundancy in descriptions.
+SystemVerilog's let construct defines reusable expressions that can be used in assertions and other contexts, improving code clarity and maintainability.
+The with clause in SystemVerilog is used extensively in constraints and coverage groups to specify conditional or iterative expressions inline.
+SystemVerilog's std::randomize() function enables randomizing variables even if they are not members of a class, providing greater flexibility in testbenches.
+The foreach loop in SystemVerilog iterates over elements of arrays, including multidimensional, associative, and dynamic arrays, in a concise manner.
+SystemVerilog's unique and priority keywords for if and case statements guide synthesis tools to avoid inferring latches and improve optimization.
+The timeunit and timeprecision declarations in SystemVerilog modules and packages explicitly define simulation time units for more accurate modeling.
+SystemVerilog's nettype construct allows for the definition of custom net types with specific resolution functions for complex signal modeling scenarios.
+The accept_on, reject_on, sync_accept_on, and sync_reject_on assertion operators in SVA allow modeling of reset and other abort conditions.
+SystemVerilog's expect statement is a procedural assertion that allows waiting for a property to be true over a specified number of clock cycles.
+The final block in SystemVerilog executes once at the end of simulation, typically used for summary reports and closing files.
+SystemVerilog's import statement for packages allows selective or wholesale inclusion of package items into a module, interface, or program scope.
+The export declaration for tasks and functions within a module facilitates hierarchical access, making them callable from higher levels of hierarchy.
+SystemVerilog's interface class and parameterized classes support advanced object-oriented patterns like multiple inheritance and generic programming.
+The cover property statement allows embedding coverage collection directly within assertions, linking functional checks with coverage metrics.
+SystemVerilog's randomize() with {} inline constraint blocks provide a way to specify additional constraints on the fly for a specific randomization call.
+The dist operator in constraint blocks allows specifying weighted distributions for random variable values, biasing stimulus toward certain ranges.
+SystemVerilog's solve..before constraint ordering guides the solver to choose values for certain variables before others, affecting probability distribution.
+The if..else inside constraint blocks enables conditional constraints, making certain constraints active based on the values of other random variables.
+SystemVerilog's foreach inside constraint blocks is used to apply constraints iteratively across all elements of an array or a slice of an array.
+The unique keyword in constraint blocks ensures that all elements of an array randomized in a single call have unique values from a set.
+SystemVerilog's static and automatic variable lifetimes in tasks and functions control whether storage is shared or unique per call.
+The extern keyword for class method declarations separates the method prototype inside the class from its implementation outside the class body.
+SystemVerilog's pure virtual functions in virtual classes (abstract classes) force derived classes to implement those functions.
+The parameterized interfaces allow for creating generic interface templates that can be instantiated with different data types or sizes.
+SystemVerilog's $system function calls an external operating system command, useful for file management or calling external scripts during simulation.
+The $test$plusargs and $value$plusargs system functions are used for runtime configuration of tests by reading command-line arguments.
+SystemVerilog's dpi context and non-context tasks and functions categorize DPI imports based on whether they call back into SystemVerilog code.
+The $fatal, $error, $warning, and $info system tasks provide standardized severity levels for reporting messages during simulation.
+SystemVerilog's $root scope provides an absolute hierarchical path starting from the top-level module, allowing unambiguous access to any instance.
+The $unit compilation unit scope is a namespace for declarations that are not enclosed within any module, interface, or package.
+SystemVerilog's bits and logic data types represent single bits and vectors, with logic being a 4-state (0,1,X,Z) type replacing reg and wire in many contexts.
+The shortreal, real, and realtime data types provide floating-point representation, with realtime being synonymous with real for simulation time.
+SystemVerilog's string data type supports dynamic strings with built-in methods for manipulation, comparison, and conversion.
+The event data type, enhanced from Verilog, allows for synchronization between processes, and triggered event method checks for event occurrence.
+SystemVerilog's chandle data type holds pointers passed through the DPI from C code, allowing SystemVerilog to reference external C objects.
+The void data type is used for functions that return no value, and as a cast type for discarding function return values.
+SystemVerilog's type operator returns the type of an expression as a value, useful for parameterized code and $typename system function.
+The $cast system function performs dynamic casting for class handles and enumerated types, returning a status to indicate success or failure.
+SystemVerilog's $isunknown system function returns true if any bit of an expression is 'X' or 'Z', useful for checking valid data.
+The $countones system function returns the number of bits set to 1 in a vector, a common operation in parity checking and population counts.
+SystemVerilog's $onehot and $onehot0 system functions check for one-hot and one-hot-or-zero encoded signals, respectively.
+The $bits system function returns the number of bits required to hold an expression as a storage unit, accounting for packed and unpacked structures.
+SystemVerilog's $size, $high, $low, $left, and $right array query functions provide information about array dimensions and ranges.
+The $dimensions system function returns the total number of dimensions of an array, distinguishing between packed and unpacked dimensions.
+SystemVerilog's $unpacked_dimensions returns the number of unpacked (memory layout) dimensions of an array.
+The $increment and $decrement assignment operators (++, --) are available for integer and real variables, as in C.
+SystemVerilog's +=, -=, *=, /=, %=, &=, |=, ^=, <<=, >>=, <<<=, >>>= assignment operators provide concise operation and assignment.
+The inside operator is used in expressions and constraints to check if a value is inside a set of values or a range (e.g., if (a inside {[1:10]})).
+SystemVerilog's implies operator in constraints and properties specifies a conditional relationship (e.g., mode == READ -> addr inside {mem_space}).
+The throughout sequence operator in SVA checks that a Boolean expression holds true continuously while a sequence is being matched.
+SystemVerilog's within sequence operator checks that one sequence occurs within the start and end of another sequence.
+The intersect sequence operator requires two sequences to start and end at the same time, matching simultaneously.
+SystemVerilog's first_match sequence operator selects only the first match of possibly multiple matches for a sequence, avoiding duplicate actions.
+The #-# and #=# cycle delay operators in sequences specify non-overlapping and overlapping succession, respectively.
+SystemVerilog's always, s_always, eventually, s_eventually, until, s_until, until_with, s_until_with are property operators for formal verification.
+The nexttime, s_nexttime, always, s_always, eventually, s_eventually are used to specify liveness and safety properties over time.
+SystemVerilog's strong and weak modifiers for sequences and properties affect how vacuous successes are treated in formal tools and simulation.
+The disable iff clause in properties allows aborting the evaluation of a property when a reset or other condition becomes true.
+SystemVerilog's matched function applied to a named sequence returns true when an instance of that sequence has been matched.
+The triggered method for a named sequence or property returns true if it has been triggered and has not yet reached its end point.
+SystemVerilog's past function in assertions allows referencing the value of an expression a specified number of clock cycles in the past.
+The rose, fell, and stable functions in SVA detect the rising edge, falling edge, or stability of a signal relative to a clock.
+SystemVerilog's $past_gclk, $rose_gclk, $fell_gclk, and $stable_gclk are global clocking variants of the assertion sampling functions.
+The $sampled function in assertions explicitly refers to the sampled value of an expression in the Preponed region of a simulation time step.
+SystemVerilog's $changed, $changed_gclk, $stable, $stable_gclk functions provide checks for value changes between consecutive clock cycles.
+The $future_gclk and $rising_gclk functions, while less common, are used in some formal tools for referencing future clock cycles.
+SystemVerilog's $countbits system function generalizes $countones to count any specified bit value (0, 1, X, Z) in a vector.
+The $assertcontrol system task provides fine-grained control over the execution of assertions, including killing and enabling specific assertions.
+SystemVerilog's $assertpassoff, $assertpasson, $assertfailoff, $assertfailon tasks control the reporting of assertion passes and failures.
+The $assertvacuousoff and $assertvacuouson tasks control whether vacuous successes of assertions are reported during simulation.
+SystemVerilog's $assertkill and $assertoff tasks stop the evaluation of assertions, with $assertkill also clearing any currently active attempts.
+The $asserton task re-enables assertion evaluation that was previously turned off by $assertoff or $assertkill.
+SystemVerilog's $get_assertion_info system function retrieves information about a specific assertion handle, such as its state and severity.
+The $error, $warning, $info, $fatal system tasks can be called from within assertions using action blocks to report custom messages.
+SystemVerilog's $coverage_control, $coverage_get_max, $coverage_get, $coverage_merge, $coverage_save system tasks manage coverage data.
+The $set_coverage_db_name system task specifies the name of the coverage database file where coverage results are saved.
+SystemVerilog's $load_coverage_db task loads coverage data from a file, allowing cumulative coverage across multiple simulation runs.
+The $coverage_get_coverage function returns the overall coverage percentage as a real number, giving a metric for verification progress.
+SystemVerilog's $assertvacuousoff task, when called, prevents vacuous successes from contributing to the overall assertion success count.
+The $isunbounded system function returns true if a specified dimension of an array is declared with an unbounded size (using $).
+SystemVerilog's $typename system function returns a string representing the resolved type of its argument, useful for debug messages.
+The $bits system function, when used on a type, returns the total storage size in bits for a variable of that type.
+SystemVerilog's $dimensions function, applied to a type identifier, returns the total number of dimensions of that type.
+The $unpacked_dimensions function returns the number of unpacked dimensions for a type, excluding packed dimensions.
+SystemVerilog's $left, $right, $low, $high, $increment, $size functions, when given a type and dimension index, return range information.
+The $root and $unit special identifiers help in navigating the hierarchical namespace and compilation unit scope, respectively.
+SystemVerilog's $c and $rtoi conversion functions convert real numbers to integers using different rounding methods (ceil and real to int).
+The $itor and $realtobits functions convert integers to reals and convert real values to a 64-bit vector representation, respectively.
+SystemVerilog's $bitstoreal function performs the inverse of $realtobits, converting a 64-bit vector back to a real value.
+The $shortrealtobits and $bitstoshortreal functions perform similar conversions for the 32-bit shortreal floating-point type.
+SystemVerilog's $psprintf function works like $sprintf but returns a dynamically allocated string, avoiding static buffer limitations.
+The $fopen, $fclose, $fdisplay, $fwrite, $fmonitor, $fstrobe system tasks provide file input/output operations for logging and data reading.
+SystemVerilog's $readmemb and $readmemh tasks initialize memories from binary or hexadecimal formatted text files, respectively.
+The $writememb and $writememh tasks write the contents of a memory to a file in binary or hexadecimal format for debugging.
+SystemVerilog's $random function returns a 32-bit random integer, using a deterministic algorithm with a seed controllable by $srandom.
+The $dist_uniform, $dist_normal, $dist_exponential, $dist_poisson, $dist_chi_square, $dist_t, $dist_erlang system functions generate random numbers from statistical distributions.
+SystemVerilog's $q_initialize, $q_add, $q_remove, $q_full, $q_exam system tasks provide a simple queue data structure for transaction modeling.
+The $async$and$array, $async$nand$array, $async$or$array, $async$nor$array system functions model asynchronous logic for net resolution of scalar and vector ports.
+SystemVerilog's $sync$and$array, $sync$nand$array, $sync$or$array, $sync$nor$array perform similar resolution but with synchronous behavior.
+The $table_model system task is used in conjunction with the Standard Delay Format (SDF) for back-annotation of timing data into a simulation.
+SystemVerilog's $scale function converts a time value from one time unit to another, based on the timescale of the calling module. The$printtimescalesystem task displays the time unit and precision of a specified module, helping to debug timing-related issues. The$timeformatsystem task specifies how the%tformat specifier in display tasks formats simulation time values for output. SystemVerilog's$realtimeand$stimesystem functions return the current simulation time as a real number or a scaled integer, respectively. The$printtimeand$printrealtimetasks display the current simulation time according to the prevailing$timeformat` specification.
