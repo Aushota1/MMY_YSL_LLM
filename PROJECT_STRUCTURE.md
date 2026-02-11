@@ -69,3 +69,6 @@ Tiny Recursive Model:
 3. **Данные** - все `.txt` файлы в `data/`
 4. **Модели** - не коммитятся в Git (в .gitignore)
 
+
+
+

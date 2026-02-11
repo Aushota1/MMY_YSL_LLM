@@ -16,3 +16,6 @@
 - `train_trm.py` - для обучения TRM модели
 - `tokenizer_trainer.py` - для обучения токенизатора
 
+
+
+
