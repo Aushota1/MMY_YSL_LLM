@@ -1,0 +1,15 @@
+module uart_tx_018 #(parameter CLK_DIV = 434) (
+    input  logic clk, rst_n, start,
+    input  logic [7:0] data,
+    output logic tx, busy
+);
+    logic [9:0] shift;
+    logic [3:0] bit_cnt;
+    logic [15:0] div;
+    always_ff @(posedge clk or negedge rst_n)
+        if (!rst_n) { tx, busy, div, bit_cnt, shift } <= '0;
+        else if (!busy && start) begin busy <= 1; shift <= {1'b1, data, 1'b0}; bit_cnt <= 0; div <= 0; end
+        else if (busy)
+            if (div == CLK_DIV-1) begin div <= 0; tx <= shift[0]; shift <= {1'b0, shift[9:1]}; bit_cnt <= bit_cnt + 1; if (bit_cnt == 9) busy <= 0; end
+            else div <= div + 1;
+endmodule

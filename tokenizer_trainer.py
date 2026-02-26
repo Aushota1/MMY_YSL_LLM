@@ -9,9 +9,112 @@
 """
 
 import os
+import pickle
+import re
 import sys
 from typing import List, Optional
 from BPE_STUCTUR import BPETokenizer
+
+
+def word_tokenize(text: str) -> List[str]:
+    """
+    Разбивает текст на токены по словам (без BPE).
+    Каждое слово — отдельный токен. Разделитель — пробелы и переводы строк.
+    Пустые токены не возвращаются.
+    """
+    if not text or not text.strip():
+        return []
+    return [t for t in re.split(r'\s+', text.strip()) if t]
+
+
+class WordTokenizer:
+    """
+    Словный токенизатор: каждое слово — один токен.
+    Сначала текст разбивается на слова, затем слова сопоставляются с числовыми id
+    для использования в embedding layer и обучении LLM.
+    """
+    TOKENIZER_TYPE = 'word'
+
+    def __init__(self):
+        self.vocab = {}           # id -> token (слово)
+        self.inverse_vocab = {}   # token -> id
+        self.special_tokens = {
+            '<PAD>': 0,
+            '<UNK>': 1,
+            '<BOS>': 2,
+            '<EOS>': 3,
+            '<SEP>': 4,
+        }
+        self._build_initial_vocab()
+
+    def _build_initial_vocab(self):
+        """Инициализация словаря специальными токенами"""
+        self.vocab = {i: t for t, i in self.special_tokens.items()}
+        self.inverse_vocab = {t: i for i, t in self.vocab.items()}
+
+    def train(self, corpus: List[str], verbose: bool = False) -> None:
+        """
+        Обучение на корпусе: собираем все уникальные слова и присваиваем им id.
+        Сначала весь текст разбивается на слова (алгоритм 12), затем строится словарь.
+        """
+        self._build_initial_vocab()
+        word_set = set()
+        for text in corpus:
+            if not text or not text.strip():
+                continue
+            for w in word_tokenize(text):
+                word_set.add(w)
+        sorted_words = sorted(word_set)
+        next_id = len(self.special_tokens)
+        for w in sorted_words:
+            self.vocab[next_id] = w
+            self.inverse_vocab[w] = next_id
+            next_id += 1
+        if verbose:
+            print(f"   Уникальных слов: {len(word_set)}, размер словаря: {self.get_vocab_size()}")
+
+    def encode(self, text: str) -> List[int]:
+        """Текст -> список id (для embedding / LLM). Неизвестные слова -> <UNK>."""
+        if not text or not text.strip():
+            return []
+        unk_id = self.special_tokens.get('<UNK>', 1)
+        ids = []
+        for w in word_tokenize(text):
+            ids.append(self.inverse_vocab.get(w, unk_id))
+        return ids
+
+    def decode(self, token_ids: List[int]) -> str:
+        """Список id -> текст (для вывода из LLM)."""
+        tokens = []
+        for i in token_ids:
+            tokens.append(self.vocab.get(i, '<UNK>'))
+        return ' '.join(tokens)
+
+    def get_vocab_size(self) -> int:
+        return len(self.vocab)
+
+    def save(self, path: str) -> None:
+        """Сохранение в том же формате, что и BPE: vocab_size, vocab, inverse_vocab, merges, special_tokens, pattern_string, has_regex, merge_order."""
+        data = {
+            'vocab_size': len(self.vocab),
+            'vocab': self.vocab,
+            'inverse_vocab': self.inverse_vocab,
+            'merges': {},
+            'special_tokens': self.special_tokens,
+            'pattern_string': None,
+            'has_regex': False,
+            'merge_order': [],
+        }
+        with open(path, 'wb') as f:
+            pickle.dump(data, f)
+
+    def load(self, path: str) -> None:
+        """Загрузка из pkl в формате BPE (те же ключи). merges/pattern/merge_order игнорируются."""
+        with open(path, 'rb') as f:
+            data = pickle.load(f)
+        self.vocab = data['vocab']
+        self.inverse_vocab = data['inverse_vocab']
+        self.special_tokens = data.get('special_tokens', self.special_tokens)
 
 
 class TokenizerTrainerApp:
@@ -20,6 +123,8 @@ class TokenizerTrainerApp:
     def __init__(self):
         self.tokenizer: Optional[BPETokenizer] = None
         self.current_model_path: Optional[str] = None
+        self.word_tokenizer: Optional[WordTokenizer] = None
+        self.word_model_path: Optional[str] = None
     
     def clear_screen(self):
         """Очистка экрана"""
@@ -48,6 +153,7 @@ class TokenizerTrainerApp:
         print("9. Показать информацию о модели")
         print("10. Сохранить модель")
         print("11. Интерактивное тестирование")
+        print("12. Словный токенизатор (word-level для LLM/embedding)")
         print("0. Выход")
         print("\n" + "=" * 70)
     
@@ -735,6 +841,169 @@ class TokenizerTrainerApp:
         print("\nВыход из интерактивного режима...")
         input("Нажмите Enter для продолжения...")
     
+    def word_tokenizer_menu(self):
+        """Подменю словного токенизатора (алгоритм 12: слова -> токены -> числа для LLM/embedding)"""
+        while True:
+            self.clear_screen()
+            self.print_header("СЛОВНЫЙ ТОКЕНИЗАТОР (WORD-LEVEL ДЛЯ LLM/EMBEDDING)")
+            print("Сначала текст разбивается на слова (каждое слово = токен), затем слова")
+            print("сопоставляются с числовыми id для embedding layer и обучения LLM.")
+            print("-" * 70)
+            if self.word_tokenizer:
+                print(f"  Модель загружена. Размер словаря: {self.word_tokenizer.get_vocab_size()}")
+                if self.word_model_path:
+                    print(f"  Файл: {self.word_model_path}")
+            else:
+                print("  Модель не создана.")
+            print("-" * 70)
+            print("1. Создать и обучить на введённых текстах")
+            print("2. Обучить на файле")
+            print("3. Загрузить модель (.pkl)")
+            print("4. Сохранить модель")
+            print("5. Показать токены текста (только разбиение на слова)")
+            print("6. Кодировать/декодировать (текст -> числа -> текст)")
+            print("0. Назад в главное меню")
+            print("-" * 70)
+            choice = input("Выберите действие: ").strip()
+
+            if choice == '0':
+                break
+            elif choice == '1':
+                self.train_word_from_input()
+            elif choice == '2':
+                self.train_word_from_file()
+            elif choice == '3':
+                self.load_word_model()
+            elif choice == '4':
+                self.save_word_model()
+            elif choice == '5':
+                self.word_show_tokens_console()
+            elif choice == '6':
+                self.word_encode_decode_console()
+            else:
+                print("\n✗ Неверный выбор.")
+                input("Нажмите Enter...")
+
+    def train_word_from_input(self):
+        """Обучение словного токенизатора на введённых текстах"""
+        self.print_header("ОБУЧЕНИЕ СЛОВНОГО ТОКЕНИЗАТОРА (ВВОД)")
+        print("Введите тексты. Каждая строка — один документ. Пустая строка или END — конец.")
+        print("-" * 70)
+        corpus = []
+        n = 1
+        while True:
+            line = input(f"Текст {n}: ").strip()
+            if not line or line.upper() == 'END':
+                break
+            corpus.append(line)
+            n += 1
+        if not corpus:
+            print("\n✗ Нет текстов.")
+            input("Нажмите Enter...")
+            return
+        verbose = input("Показывать прогресс? (y/n): ").strip().lower() == 'y'
+        self.word_tokenizer = WordTokenizer()
+        self.word_tokenizer.train(corpus, verbose=verbose)
+        self.word_model_path = None
+        print(f"\n✓ Обучено. Размер словаря: {self.word_tokenizer.get_vocab_size()} (слова → id для LLM/embedding)")
+        input("Нажмите Enter...")
+
+    def train_word_from_file(self):
+        """Обучение словного токенизатора на файле"""
+        self.print_header("ОБУЧЕНИЕ СЛОВНОГО ТОКЕНИЗАТОРА (ФАЙЛ)")
+        path = input("Путь к файлу с корпусом: ").strip()
+        if not path or not os.path.exists(path):
+            print("\n✗ Файл не указан или не найден.")
+            input("Нажмите Enter...")
+            return
+        enc = input("Кодировка (Enter = utf-8): ").strip() or 'utf-8'
+        try:
+            with open(path, 'r', encoding=enc) as f:
+                corpus = f.readlines()
+        except Exception as e:
+            print(f"\n✗ Ошибка чтения: {e}")
+            input("Нажмите Enter...")
+            return
+        verbose = input("Показывать прогресс? (y/n): ").strip().lower() == 'y'
+        self.word_tokenizer = WordTokenizer()
+        self.word_tokenizer.train(corpus, verbose=verbose)
+        self.word_model_path = None
+        print(f"\n✓ Обучено. Строк: {len(corpus)}, размер словаря: {self.word_tokenizer.get_vocab_size()}")
+        input("Нажмите Enter...")
+
+    def load_word_model(self):
+        """Загрузка словной модели"""
+        self.print_header("ЗАГРУЗКА СЛОВНОЙ МОДЕЛИ")
+        path = input("Путь к файлу (.pkl): ").strip()
+        if not path or not os.path.exists(path):
+            print("\n✗ Файл не указан или не найден.")
+            input("Нажмите Enter...")
+            return
+        try:
+            self.word_tokenizer = WordTokenizer()
+            self.word_tokenizer.load(path)
+            self.word_model_path = path
+            print(f"\n✓ Модель загружена. Размер словаря: {self.word_tokenizer.get_vocab_size()}")
+        except Exception as e:
+            print(f"\n✗ Ошибка: {e}")
+        input("Нажмите Enter...")
+
+    def save_word_model(self):
+        """Сохранение словной модели"""
+        if not self.word_tokenizer:
+            print("\n✗ Сначала создайте или загрузите словный токенизатор.")
+            input("Нажмите Enter...")
+            return
+        self.print_header("СОХРАНЕНИЕ СЛОВНОЙ МОДЕЛИ")
+        path = input("Путь для сохранения (.pkl): ").strip()
+        if not path:
+            print("\n✗ Путь не указан.")
+            input("Нажмите Enter...")
+            return
+        if not path.endswith('.pkl'):
+            path += '.pkl'
+        try:
+            self.word_tokenizer.save(path)
+            self.word_model_path = path
+            print(f"\n✓ Сохранено: {path}")
+        except Exception as e:
+            print(f"\n✗ Ошибка: {e}")
+        input("Нажмите Enter...")
+
+    def word_show_tokens_console(self):
+        """Показать разбиение текста на слова (без модели)"""
+        self.print_header("ТОКЕНЫ ПО СЛОВАМ (БЕЗ BPE)")
+        print("Введите текст — будет показано разбиение на слова. Пустая строка — выход.")
+        print("-" * 70)
+        while True:
+            text = input("\nТекст: ").strip()
+            if not text:
+                break
+            tokens = word_tokenize(text)
+            print(f"  Токены: {tokens}")
+            print(f"  Количество: {len(tokens)}")
+        input("Нажмите Enter...")
+
+    def word_encode_decode_console(self):
+        """Кодирование текста в числа и обратно (для проверки LLM/embedding)"""
+        if not self.word_tokenizer:
+            print("\n✗ Сначала создайте или загрузите словный токенизатор (п. 1–3).")
+            input("Нажмите Enter...")
+            return
+        self.print_header("ТЕКСТ -> ЧИСЛА -> ТЕКСТ")
+        print("Введите текст. Будет показана последовательность id и декодированный текст.")
+        print("Пустая строка — выход.")
+        print("-" * 70)
+        while True:
+            text = input("\nТекст: ").strip()
+            if not text:
+                break
+            ids = self.word_tokenizer.encode(text)
+            decoded = self.word_tokenizer.decode(ids)
+            print(f"  ID:    {ids}")
+            print(f"  Декод: {decoded}")
+        input("Нажмите Enter...")
+
     def run(self):
         """Запуск приложения"""
         while True:
@@ -744,9 +1013,13 @@ class TokenizerTrainerApp:
             
             if choice == '0':
                 if self.tokenizer and self.current_model_path:
-                    save = input("\nСохранить модель перед выходом? (y/n): ").strip().lower() == 'y'
+                    save = input("\nСохранить BPE-модель перед выходом? (y/n): ").strip().lower() == 'y'
                     if save:
                         self.save_model()
+                if self.word_tokenizer:
+                    save_w = input("Сохранить словную модель (word-level) перед выходом? (y/n): ").strip().lower() == 'y'
+                    if save_w:
+                        self.save_word_model()
                 print("\nДо свидания!")
                 break
             elif choice == '1':
@@ -771,6 +1044,8 @@ class TokenizerTrainerApp:
                 self.save_model()
             elif choice == '11':
                 self.interactive_test()
+            elif choice == '12':
+                self.word_tokenizer_menu()
             else:
                 print("\n✗ Неверный выбор. Попробуйте снова.")
                 input("Нажмите Enter для продолжения...")

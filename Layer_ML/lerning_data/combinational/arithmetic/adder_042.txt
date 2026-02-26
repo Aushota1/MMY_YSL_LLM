@@ -1,0 +1,8 @@
+module adder_042 (
+    input  logic [15:0] a, b,
+    input  logic cin,
+    output logic [15:0] sum,
+    output logic cout
+);
+    assign {cout, sum} = a + b + cin;
+endmodule

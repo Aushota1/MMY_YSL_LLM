@@ -1,0 +1,6 @@
+module and_n_017 #(parameter N = 8) (
+    input  logic [N-1:0] a, b,
+    output logic [N-1:0] y
+);
+    assign y = a & b;
+endmodule

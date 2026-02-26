@@ -1,0 +1,12 @@
+module sync_ram_006 #(parameter A = 8, D = 8) (
+    input  logic clk, we,
+    input  logic [A-1:0] addr,
+    input  logic [D-1:0] wdata,
+    output logic [D-1:0] rdata
+);
+    logic [D-1:0] mem [0:(1<<A)-1];
+    always_ff @(posedge clk) begin
+        if (we) mem[addr] <= wdata;
+        rdata <= mem[addr];
+    end
+endmodule

@@ -1,0 +1,12 @@
+module i2c_stub_098 (
+    input  logic clk, rst_n, start,
+    input  logic [7:0] addr, wdata,
+    output logic [7:0] rdata,
+    inout  wire  sda, scl,
+    output logic busy
+);
+    assign sda = 1'bz;
+    assign scl = 1'bz;
+    assign rdata = 8'b0;
+    assign busy = 1'b0;
+endmodule

@@ -1,0 +1,22 @@
+module i2c_simple (
+    input  logic clk, rst_n, start, rw,
+    input  logic [7:0] addr, wdata,
+    output logic [7:0] rdata,
+    inout  wire  sda, scl,
+    output logic busy, ack_err
+);
+    logic sda_oe, sda_out;
+    assign sda = sda_oe ? sda_out : 1'bz;
+    logic [2:0] state;
+    localparam IDLE=0, START=1, ADDR=2, DATA=3, STOP=4;
+    always_ff @(posedge clk or negedge rst_n)
+        if (!rst_n) { state, sda_oe, sda_out, busy, ack_err } <= '0;
+        else case (state)
+            IDLE: if (start) state <= START;
+            START: begin sda_oe <= 1; sda_out <= 0; state <= ADDR; end
+            ADDR: state <= DATA;
+            DATA: state <= STOP;
+            STOP: begin state <= IDLE; busy <= 0; end
+            default: state <= IDLE;
+        endcase
+endmodule

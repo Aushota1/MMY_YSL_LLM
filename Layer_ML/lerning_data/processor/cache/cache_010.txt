@@ -1,0 +1,20 @@
+module cache_010 #(parameter LINE_W = 6, TAG_W = 8, D = 32) (
+    input  logic clk, rst_n, we, re,
+    input  logic [TAG_W+LINE_W-1:0] addr,
+    input  logic [D-1:0] wdata,
+    output logic [D-1:0] rdata,
+    output logic hit
+);
+    localparam LINES = 1 << LINE_W;
+    logic [TAG_W-1:0] tag_ram [0:LINES-1];
+    logic [D-1:0]     data_ram [0:LINES-1];
+    logic [TAG_W-1:0] addr_tag;
+    logic [LINE_W-1:0] addr_line;
+    assign addr_tag = addr[TAG_W+LINE_W-1:LINE_W];
+    assign addr_line = addr[LINE_W-1:0];
+    always_ff @(posedge clk or negedge rst_n)
+        if (!rst_n) for (int i = 0; i < LINES; i++) tag_ram[i] <= '0;
+        else if (we) begin data_ram[addr_line] <= wdata; tag_ram[addr_line] <= addr_tag; end
+    assign rdata = data_ram[addr_line];
+    assign hit = (tag_ram[addr_line] == addr_tag);
+endmodule

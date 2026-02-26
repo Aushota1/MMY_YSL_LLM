@@ -1,0 +1,10 @@
+module decoder2x4 (
+    input  logic [1:0] addr,
+    input  logic en,
+    output logic [3:0] y
+);
+    assign y[0] = en & (addr == 2'b00);
+    assign y[1] = en & (addr == 2'b01);
+    assign y[2] = en & (addr == 2'b10);
+    assign y[3] = en & (addr == 2'b11);
+endmodule

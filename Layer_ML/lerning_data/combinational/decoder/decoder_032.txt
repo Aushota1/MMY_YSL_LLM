@@ -1,0 +1,7 @@
+module decoder_032 (
+    input  logic [3:0] a,
+    input  logic              en,
+    output logic [15:0] y
+);
+    assign y = en ? (16'b1 << a) : '0;
+endmodule

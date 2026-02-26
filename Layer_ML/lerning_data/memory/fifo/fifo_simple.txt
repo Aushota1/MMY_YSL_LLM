@@ -1,0 +1,19 @@
+module fifo_simple #(parameter W = 8, D = 16) (
+    input  logic clk, rst_n,
+    input  logic push, pop,
+    input  logic [W-1:0] wdata,
+    output logic [W-1:0] rdata,
+    output logic full, empty
+);
+    logic [W-1:0] mem [0:D-1];
+    logic [$clog2(D):0] wr_ptr, rd_ptr;
+    assign full  = (wr_ptr[$clog2(D)] != rd_ptr[$clog2(D)]) && (wr_ptr[$clog2(D)-1:0] == rd_ptr[$clog2(D)-1:0]);
+    assign empty = (wr_ptr == rd_ptr);
+    assign rdata = mem[rd_ptr[$clog2(D)-1:0]];
+    always_ff @(posedge clk or negedge rst_n)
+        if (!rst_n) {wr_ptr, rd_ptr} <= '0;
+        else begin
+            if (push && !full) begin mem[wr_ptr[$clog2(D)-1:0]] <= wdata; wr_ptr <= wr_ptr + 1; end
+            if (pop && !empty) rd_ptr <= rd_ptr + 1;
+        end
+endmodule

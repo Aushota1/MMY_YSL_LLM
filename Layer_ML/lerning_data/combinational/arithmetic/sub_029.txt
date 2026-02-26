@@ -1,0 +1,7 @@
+module sub_029 (
+    input  logic [7:0] a, b,
+    output logic [7:0] diff,
+    output logic borrow
+);
+    assign {borrow, diff} = a - b;
+endmodule

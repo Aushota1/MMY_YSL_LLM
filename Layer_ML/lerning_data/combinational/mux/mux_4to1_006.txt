@@ -1,0 +1,7 @@
+module mux_4to1_006 #(parameter W = 2) (
+    input  logic [W-1:0] a, b, c, d,
+    input  logic [1:0]   sel,
+    output logic [W-1:0] y
+);
+    assign y = (sel == 2'b00) ? a : (sel == 2'b01) ? b : (sel == 2'b10) ? c : d;
+endmodule

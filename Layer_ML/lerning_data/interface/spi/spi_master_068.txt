@@ -1,0 +1,13 @@
+module spi_master_068 #(parameter W = 32) (
+    input  logic clk, rst_n, start,
+    input  logic [W-1:0] mosi_data,
+    output logic [W-1:0] miso_data,
+    output logic sclk, mosi, cs_n, busy
+);
+    logic [W-1:0] mosi_sr, miso_sr;
+    logic [4:0] cnt;
+    always_ff @(posedge clk or negedge rst_n)
+        if (!rst_n) { busy, cs_n, sclk, cnt } <= '0;
+        else if (!busy && start) begin mosi_sr <= mosi_data; cs_n <= 0; cnt <= 0; busy <= 1; end
+        else if (busy) begin sclk <= ~sclk; if (~sclk) begin mosi <= mosi_sr[W-1]; mosi_sr <= {mosi_sr[W-2:0], 1'b0}; cnt <= cnt + 1; if (cnt == W-1) begin busy <= 0; cs_n <= 1; miso_data <= miso_sr; end end end
+endmodule

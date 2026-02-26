@@ -1,0 +1,8 @@
+module counter_up_075 #(parameter W = 32) (
+    input  logic clk, rst_n, en,
+    output logic [W-1:0] q
+);
+    always_ff @(posedge clk or negedge rst_n)
+        if (!rst_n) q <= '0;
+        else if (en) q <= q + 1;
+endmodule

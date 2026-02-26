@@ -1,0 +1,259 @@
+```systemverilog
+// Файл: and_gate.sv
+// Класс: 0
+module and_gate (
+    input logic a,
+    input logic b,
+    output logic y
+);
+    assign y = a & b;
+endmodule
+```
+
+```systemverilog
+// Файл: mux2to1.sv
+// Класс: 1
+module mux2to1 (
+    input logic sel,
+    input logic a,
+    input logic b,
+    output logic y
+);
+    assign y = sel ? b : a;
+endmodule
+```
+
+```systemverilog
+// Файл: adder.sv
+// Класс: 2
+module adder #(
+    parameter WIDTH = 8
+) (
+    input logic [WIDTH-1:0] a,
+    input logic [WIDTH-1:0] b,
+    output logic [WIDTH-1:0] sum,
+    output logic carry_out
+);
+    assign {carry_out, sum} = a + b;
+endmodule
+```
+
+```systemverilog
+// Файл: register.sv
+// Класс: 3
+module register #(
+    parameter WIDTH = 8
+) (
+    input logic clk,
+    input logic rst_n,
+    input logic [WIDTH-1:0] d,
+    output logic [WIDTH-1:0] q
+);
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            q <= '0;
+        else
+            q <= d;
+    end
+endmodule
+```
+
+```systemverilog
+// Файл: counter.sv
+// Класс: 4
+module counter #(
+    parameter WIDTH = 4
+) (
+    input logic clk,
+    input logic rst_n,
+    input logic enable,
+    output logic [WIDTH-1:0] count
+);
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            count <= '0;
+        else if (enable)
+            count <= count + 1;
+    end
+endmodule
+```
+
+```systemverilog
+// Файл: fsm.sv
+// Класс: 5
+module fsm (
+    input logic clk,
+    input logic rst_n,
+    input logic start,
+    output logic done
+);
+    typedef enum logic [1:0] {IDLE, BUSY, DONE} state_t;
+    state_t state, next_state;
+    
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            state <= IDLE;
+        else
+            state <= next_state;
+    end
+    
+    always_comb begin
+        next_state = state;
+        done = 1'b0;
+        
+        case (state)
+            IDLE: if (start) next_state = BUSY;
+            BUSY: next_state = DONE;
+            DONE: begin
+                done = 1'b1;
+                next_state = IDLE;
+            end
+        endcase
+    end
+endmodule
+```
+
+```systemverilog
+// Файл: fifo.sv
+// Класс: 6
+module fifo #(
+    parameter DEPTH = 8,
+    parameter WIDTH = 16
+) (
+    input logic clk,
+    input logic rst_n,
+    input logic write_en,
+    input logic read_en,
+    input logic [WIDTH-1:0] write_data,
+    output logic [WIDTH-1:0] read_data,
+    output logic full,
+    output logic empty
+);
+    logic [WIDTH-1:0] mem [0:DEPTH-1];
+    logic [$clog2(DEPTH)-1:0] write_ptr, read_ptr;
+    logic [$clog2(DEPTH):0] count;
+    
+    assign full = (count == DEPTH);
+    assign empty = (count == 0);
+    
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            write_ptr <= '0;
+            read_ptr <= '0;
+            count <= '0;
+        end else begin
+            if (write_en && !full) begin
+                mem[write_ptr] <= write_data;
+                write_ptr <= write_ptr + 1;
+            end
+            if (read_en && !empty) begin
+                read_data <= mem[read_ptr];
+                read_ptr <= read_ptr + 1;
+            end
+            if (write_en && !full && !(read_en && !empty))
+                count <= count + 1;
+            else if (read_en && !empty && !(write_en && !full))
+                count <= count - 1;
+        end
+    end
+endmodule
+```
+
+```systemverilog
+// Файл: arbiter.sv
+// Класс: 7
+module arbiter #(
+    parameter REQUESTS = 4
+) (
+    input logic clk,
+    input logic rst_n,
+    input logic [REQUESTS-1:0] request,
+    output logic [REQUESTS-1:0] grant
+);
+    logic [$clog2(REQUESTS)-1:0] last_grant;
+    
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            last_grant <= '0;
+        else if (|request)
+            for (int i = 0; i < REQUESTS; i++)
+                if (request[(last_grant + i + 1) % REQUESTS]) begin
+                    last_grant <= (last_grant + i + 1) % REQUESTS;
+                    break;
+                end
+    end
+    
+    always_comb begin
+        grant = '0;
+        if (|request)
+            grant[last_grant] = 1'b1;
+    end
+endmodule
+```
+
+```systemverilog
+// Файл: cdc_sync.sv
+// Класс: 8
+module cdc_sync #(
+    parameter STAGES = 2
+) (
+    input logic src_clk,
+    input logic src_rst_n,
+    input logic src_data,
+    input logic dst_clk,
+    input logic dst_rst_n,
+    output logic dst_data
+);
+    logic [STAGES-1:0] sync_reg;
+    
+    always_ff @(posedge dst_clk or negedge dst_rst_n) begin
+        if (!dst_rst_n)
+            sync_reg <= '0;
+        else
+            sync_reg <= {sync_reg[STAGES-2:0], src_data};
+    end
+    
+    assign dst_data = sync_reg[STAGES-1];
+endmodule
+```
+
+```systemverilog
+// Файл: interface_wrapper.sv
+// Класс: 9
+interface bus_if #(
+    parameter WIDTH = 8
+);
+    logic clk;
+    logic rst_n;
+    logic [WIDTH-1:0] addr;
+    logic [WIDTH-1:0] data;
+    logic read;
+    logic write;
+    logic ready;
+    
+    modport master (
+        output addr, data, read, write,
+        input ready, clk, rst_n
+    );
+    
+    modport slave (
+        input addr, data, read, write, clk, rst_n,
+        output ready
+    );
+endinterface
+
+module interface_wrapper (
+    bus_if.master bus
+);
+    logic [7:0] internal_reg;
+    
+    always_ff @(posedge bus.clk or negedge bus.rst_n) begin
+        if (!bus.rst_n)
+            internal_reg <= '0;
+        else if (bus.write)
+            internal_reg <= bus.data;
+    end
+    
+    assign bus.ready = 1'b1;
+endmodule
+```

@@ -1,0 +1,7 @@
+module mux_2to1_018 #(parameter W = 2) (
+    input  logic [W-1:0] a, b,
+    input  logic         sel,
+    output logic [W-1:0] y
+);
+    assign y = sel ? b : a;
+endmodule

@@ -1,0 +1,14 @@
+module fsm_simple (
+    input  logic clk, rst_n, go, done,
+    output logic [1:0] state
+);
+    localparam IDLE = 2'b00, RUN = 2'b01, DONE = 2'b10;
+    always_ff @(posedge clk or negedge rst_n)
+        if (!rst_n) state <= IDLE;
+        else case (state)
+            IDLE: state <= go ? RUN : IDLE;
+            RUN:  state <= done ? DONE : RUN;
+            DONE: state <= IDLE;
+            default: state <= IDLE;
+        endcase
+endmodule

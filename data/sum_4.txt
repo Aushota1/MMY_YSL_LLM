@@ -1,0 +1,10 @@
+module saturating_adder (
+    input  logic [7:0] a, b,
+    output logic [7:0] sum,
+    output logic overflow
+);
+    logic [8:0] result;
+    assign result = a + b;
+    assign overflow = (result[8] != result[7]) & (a[7] == b[7]);
+    assign sum = overflow ? {a[7], {7{~a[7]}}} : result[7:0];
+endmodule

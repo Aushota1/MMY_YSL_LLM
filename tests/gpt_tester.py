@@ -51,7 +51,9 @@ class GPTTester:
         checkpoint = torch.load(model_path, map_location=self.device)
         
         # Получение параметров из checkpoint
-        vocab_size = checkpoint.get('vocab_size', self.tokenizer.get_vocab_size())
+        # ВАЖНО: всегда используем размер словаря токенизатора, а не из чекпоинта
+        # так как модель должна работать с текущим токенизатором
+        vocab_size = self.tokenizer.get_vocab_size()
         embedding_dim = checkpoint.get('embedding_dim', 256)
         num_layers = checkpoint.get('num_layers', 6)
         num_heads = checkpoint.get('num_heads', 8)
@@ -124,11 +126,29 @@ class GPTTester:
             self.model.load_state_dict(checkpoint['model_state_dict'], strict=True)
             print(f"✓ Веса модели загружены успешно")
         except RuntimeError as e:
-            # Если строгая загрузка не удалась, пробуем нестрогую
+            # Если строгая загрузка не удалась, пробуем нестрогую с фильтрацией
             print(f"⚠️  Предупреждение при загрузке весов: {e}")
-            print(f"⚠️  Попытка нестрогой загрузки...")
+            print(f"⚠️  Попытка нестрогой загрузки с фильтрацией несовпадающих размеров...")
+            
+            # Фильтруем state_dict, удаляя ключи с несовпадающими размерами
+            model_state_dict = self.model.state_dict()
+            filtered_state_dict = {}
+            
+            for key, value in checkpoint['model_state_dict'].items():
+                if key in model_state_dict:
+                    # Проверяем совпадение размеров
+                    if model_state_dict[key].shape == value.shape:
+                        filtered_state_dict[key] = value
+                    else:
+                        print(f"⚠️  Пропущен ключ '{key}': размеры не совпадают "
+                              f"(чекпоинт: {value.shape}, модель: {model_state_dict[key].shape})")
+                else:
+                    # Ключ отсутствует в модели - пропускаем
+                    pass
+            
+            # Загружаем отфильтрованный state_dict
             missing_keys, unexpected_keys = self.model.load_state_dict(
-                checkpoint['model_state_dict'], strict=False
+                filtered_state_dict, strict=False
             )
             if missing_keys:
                 print(f"⚠️  Отсутствующие ключи (игнорируются): {len(missing_keys)} ключей")

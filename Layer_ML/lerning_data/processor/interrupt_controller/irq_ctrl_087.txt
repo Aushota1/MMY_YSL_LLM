@@ -1,0 +1,13 @@
+module irq_ctrl_087 #(parameter N = 32) (
+    input  logic clk, rst_n,
+    input  logic [N-1:0] irq, mask, ack,
+    output logic [N-1:0] pending,
+    output logic         any_irq
+);
+    logic [N-1:0] latched;
+    always_ff @(posedge clk or negedge rst_n)
+        if (!rst_n) latched <= '0;
+        else latched <= (latched | (irq & mask)) & ~ack;
+    assign pending = latched & mask;
+    assign any_irq = |pending;
+endmodule

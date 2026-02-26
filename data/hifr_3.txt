@@ -1,0 +1,10 @@
+module address_decoder (
+    input  logic [31:0] addr,
+    input  logic valid,
+    output logic cs_rom, cs_ram, cs_uart, cs_gpio
+);
+    assign cs_rom  = valid & (addr >= 32'h0000_0000 && addr < 32'h0001_0000);
+    assign cs_ram  = valid & (addr >= 32'h0001_0000 && addr < 32'h0002_0000);
+    assign cs_uart = valid & (addr >= 32'h0002_0000 && addr < 32'h0002_1000);
+    assign cs_gpio = valid & (addr >= 32'h0002_1000 && addr < 32'h0002_2000);
+endmodule

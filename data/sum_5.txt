@@ -1,0 +1,11 @@
+module add_sub (
+    input  logic [7:0] a, b,
+    input  logic sub,        // 0 = add, 1 = subtract
+    output logic [7:0] result,
+    output logic carry_out
+);
+    logic [8:0] temp;
+    assign temp = sub ? (a - b) : (a + b);
+    assign result = temp[7:0];
+    assign carry_out = temp[8];
+endmodule

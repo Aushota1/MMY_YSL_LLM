@@ -1,0 +1,15 @@
+module fsm_021 (
+    input  logic clk, rst_n, start, done,
+    output logic [2:0] state
+);
+    localparam S0 = 3'd0, S1 = 3'd1, S2 = 3'd2, S3 = 3'd3, S4 = 3'd4;
+    always_ff @(posedge clk or negedge rst_n)
+        if (!rst_n) state <= S0;
+        else case (state)
+            S0: state <= start ? S1 : S0;
+            S1: state <= S2;
+            S2: state <= done ? S3 : S2;
+            S3: state <= S0;
+            default: state <= S0;
+        endcase
+endmodule

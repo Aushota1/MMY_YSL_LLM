@@ -1,0 +1,13 @@
+module eth_mac_070 (
+    input  logic clk, rst_n,
+    input  logic [7:0] tx_data,
+    input  logic tx_valid, tx_last,
+    output logic tx_ready,
+    output logic [7:0] rx_data,
+    output logic rx_valid, rx_last
+);
+    assign tx_ready = 1'b1;
+    assign rx_data = 8'b0;
+    assign rx_valid = 1'b0;
+    assign rx_last = 1'b0;
+endmodule
